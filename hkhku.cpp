@@ -28,6 +28,8 @@ bool czyDasiePrzejscTabliceNx2 (int MaxClimb ,int Rozmiar, int** tablica, int x,
     return false;
 
 
+    EHJAHSDHFAKSDHFA,
+
 
 }
 
