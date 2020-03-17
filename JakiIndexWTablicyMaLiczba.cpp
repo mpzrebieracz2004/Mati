@@ -2,90 +2,161 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <stdio.h>
+#include <math.h>
 
 using namespace std;
 
-void PrzekazywanieCzesciTablicyNaNowaTablice(int* TablicaDoPrzekazania, int* tablicaOtrzymujacaWartosci, int ZakresDolny, int ZakresGorny)
+
+int IndexWTablicyDanejLiczby_Lin(int* tablica, int RozmiarTablicy, int LiczbaDoSprawdzenia)
 {
-    int j=0;
-    for(int i = ZakresDolny; i < ZakresGorny; i++)
+    for(int i=0; i < RozmiarTablicy; i++)
     {
-        tablicaOtrzymujacaWartosci[j] = TablicaDoPrzekazania[i];
-    }
-}
-int IndexWTablicyDanejLiczby_Log(int* tablica, int RozmiarTablicy, int LiczbaDoSprawdzenia)
-{
-    if (LiczbaDoSprawdzenia == tablica[RozmiarTablicy / 2]
-    {
-        int Indexk = RozmiarTablicy / 2;
-        return Indexk;
-    }
-    if( LiczbaDoSprawdzenia < tablica[RozmiarTablicy / 2])
-    {
-        int DolnaTablica[RozmiarTablicy/2];
-        PrzekazywanieCzesciTablicyNaNowaTablice(tablica, DolnaTablica, 0, RozmiarTablicy/2);
-        return IndexWTablicyDanejLiczby_Log( Dolnatablica, RozmiarTablicy/2, LiczbaDoSprawdzenia);
-    }
-    else
-    {
-        int GornaTablica[RozmiarTablicy / 2];
-        PrzekazywanieCzesciTablicyNaNowaTablice(tablica, GornaTablica, RozmiarTablicy/2), RozmiarTablicy);
-        return IndexWTablicyDanejLiczby_Log( Gornatablica, RozmiarTablicy/2, LiczbaDoSprawdzenia);
+        if( tablica[i] == LiczbaDoSprawdzenia)
+        return i;
     }
     return -1;
 }
+int IndexWTablicyDanejLiczby_LogRek(int* tablica, int Rozmiar, int LiczbaDoSprawdzenia, int indexPoczatkowy, int indexKoncowy)
+{
+    int k = ( indexPoczatkowy + indexKoncowy) / 2;
+    if( LiczbaDoSprawdzenia == tablica[k])
+    return k;
+    if( LiczbaDoSprawdzenia < tablica[k])
+    {
+        if( indexKoncowy > indexPoczatkowy)
+        return IndexWTablicyDanejLiczby_LogRek(tablica, Rozmiar, LiczbaDoSprawdzenia, indexPoczatkowy, k);
+        else
+        return -1;
+    }
+    else
+    {
+        if( indexKoncowy >= indexPoczatkowy)
+        return IndexWTablicyDanejLiczby_LogRek(tablica, Rozmiar, LiczbaDoSprawdzenia, k+1, indexKoncowy);
+        else
+        return -1;
+    }
+    return -1;
+}
+int IndexWTablicyDanejLiczby_Log(int* tablica, int Rozmiar, int LiczbaDoSprawdzenia)
+{
+    int indexPoczatkowy = 0;
+    int indexKoncowy = Rozmiar - 1;
+    while ( LiczbaDoSprawdzenia != tablica[(indexKoncowy + indexPoczatkowy) / 2] && indexPoczatkowy != indexKoncowy )
+    {
+        if (LiczbaDoSprawdzenia > tablica[(indexKoncowy + indexPoczatkowy) / 2])
+        {
+            indexPoczatkowy = ceil( (indexKoncowy + indexPoczatkowy) / 2.0 );
+        }
+        else
+        {
+            indexKoncowy = floor( (indexKoncowy + indexPoczatkowy) / 2.0 );
+        }
+    }
+    if( LiczbaDoSprawdzenia != tablica[(indexKoncowy + indexPoczatkowy) / 2])
+    return -1;
+    return ( indexKoncowy + indexPoczatkowy ) / 2;
+}
 
-void KWSrodku_Test ()
+void KWSrodku_Test1 ()
 {
     int k = 5;
     int Tablica[] = {1,2,3,4,5,6};
-    bool res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k) - 4;
-    bool res2 = IndexWTablicyDanejLiczby_Log(Tablica, 6, k) - 4;
-    assert(!res1);
-    assert(!res2);
+    int res1 = IndexWTablicyDanejLiczby_Lin (Tablica, 6, k);
+    assert(res1 == 4);
 }
-void NieMaK_Test ()
+void KWSrodku_Test2 ()
 {
-    int k = 10;
+    int k = 5;
     int Tablica[] = {1,2,3,4,5,6};
-    bool res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k) + 1;
-    bool res2 = IndexWTablicyDanejLiczby_Log(Tablica, 6, k) + 1;
-    assert(!res1);
-    assert(!res2);
+    int res2 = IndexWTablicyDanejLiczby_LogRek (Tablica, 6, k, 0, 6);
+    assert(res2 == 4);
 }
-void KNaPoczatku_Test ()
+void KWSrodku_Test3 ()
+{
+    int k = 5;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res3 = IndexWTablicyDanejLiczby_Log (Tablica, 6, k);
+    assert(res3 == 4);
+}
+void NieMaK_Test1 ()
+{
+    int k = -10;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res1 = IndexWTablicyDanejLiczby_Lin (Tablica, 6, k);
+    assert(res1 == -1);
+}
+void NieMaK_Test2 ()
+{
+    int k = -10;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res2 = IndexWTablicyDanejLiczby_LogRek (Tablica, 6, k, 0, 5);
+    assert(res2 == -1);
+}
+void NieMaK_Test3 ()
+{
+    int k = -10;
+    int Tablica[] = {1,2,3,4,5,6};
+
+    int res3 = IndexWTablicyDanejLiczby_Log (Tablica, 6, k);
+    assert(res3 == -1);
+}
+void KNaPoczatku_Test1 ()
 {
     int k = 1;
     int Tablica[] = {1,2,3,4,5,6};
-    bool res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k);
-    bool res2 = IndexWTablicyDanejLiczby_Log(Tablica, 6, k);
-    assert(!res1);
-    assert(!res2);
+    int res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k);
+    assert(res1 == 0);
 }
-void KNaKoncu_Test ()
+void KNaPoczatku_Test2 ()
+{
+    int k = 1;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res2 = IndexWTablicyDanejLiczby_LogRek(Tablica, 6, k, 0, 5);
+    assert(res2 == 0);
+}
+void KNaPoczatku_Test3 ()
+{
+    int k = 1;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res3 = IndexWTablicyDanejLiczby_Log (Tablica, 6, k);
+    assert(res3 == 0);
+}
+void KNaKoncu_Test1 ()
 {
     int k = 6;
     int Tablica[] = {1,2,3,4,5,6};
-    bool res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k) - 5;
-    bool res2 = IndexWTablicyDanejLiczby_Log(Tablica, 6, k) - 5;
-    assert(!res1);
-    assert(!res2);
+    int res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 6, k);
+    assert(res1 == 5);
 }
-void Tablica1El_Test ()
+void KNaKoncu_Test2 ()
 {
     int k = 6;
-    int Tablica[] = {6};
-    bool res1 = IndexWTablicyDanejLiczby_Lin(Tablica, 1, k);
-    bool res2 = IndexWTablicyDanejLiczby_Log(Tablica, 1, k);
-    assert(!res1);
-    assert(!res2);
+    int Tablica[] = {1,2,3,4,5,6};
+    int res2 = IndexWTablicyDanejLiczby_LogRek(Tablica, 6, k, 0, 5);
+    assert(res2 == 5);
 }
+void KNaKoncu_Test3 ()
+{
+    int k = 6;
+    int Tablica[] = {1,2,3,4,5,6};
+    int res3 = IndexWTablicyDanejLiczby_Log (Tablica, 6, k);
+    assert(res3 == 5);
+}
+
 int main()
 {
-    KNaKoncu_Test();
-    KNaPoczatku_Test();
-    NieMaK_Test();
-    KWSrodku_Test();
-    Tablica1El_Test();
+    KNaKoncu_Test1();
+    KNaKoncu_Test2();
+    KNaKoncu_Test3();
+    KNaPoczatku_Test1();
+    KNaPoczatku_Test2();
+    KNaPoczatku_Test3();
+    NieMaK_Test1();
+    NieMaK_Test2();
+    NieMaK_Test3();
+    KWSrodku_Test1();
+    KWSrodku_Test2();
+    KWSrodku_Test3();
     return 0;
 }
